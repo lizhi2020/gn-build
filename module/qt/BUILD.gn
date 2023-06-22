@@ -1,0 +1,25 @@
+import("//qtconfig.gni")
+
+qt_include_dir = qt_dir + "/include"
+qt_lib_dir = qt_dir + "/lib"
+config("Qtbase"){
+    include_dirs = [ qt_include_dir ]
+    lib_dirs = [qt_lib_dir]
+}
+
+config("Qt5Gui"){
+    include_dirs =  [ qt_include_dir +"/QtGui" ]
+    libs = [ "Qt5Gui.lib"]
+}
+config("Qt5Widgets"){
+    include_dirs =  [ qt_include_dir +"/QtWidgets" ]
+    libs = [ "Qt5Widgets.lib"]
+}
+config("Qt5Core"){
+    include_dirs =  [ qt_include_dir +"/QtCore" ]
+    libs = [ "Qt5Core.lib"]
+}
+config("Qt53Dinput"){
+    include_dirs =  [ qt_include_dir +"/QtCore" ]
+    libs = [ "Qt5Core.lib"]
+}

@@ -1,0 +1,95 @@
+template("qt_rcc") {
+  action_name = "${target_name}"
+  action_foreach(action_name) {
+    script = "//build/qt_bin_tool.py"
+    sources = invoker.sources
+    outputs = [ "$target_gen_dir/qrc_{{source_name_part}}.cpp" ]
+    args = [
+      "rcc",
+      "{{source}}",
+      "-o",
+      rebase_path("$target_gen_dir/qrc_{{source_name_part}}.cpp",
+                  root_build_dir),
+    ]
+  }
+}
+
+template("qt_uic") {
+  action_name = "${target_name}"
+  action_foreach(action_name) {
+    script = "//build/qt_bin_tool.py"
+    sources = invoker.sources
+    outputs = [ "$target_gen_dir/ui_{{source_name_part}}.h" ]
+    args = [
+      "uic",
+      "{{source}}",
+      "-o",
+      rebase_path("$target_gen_dir/ui_{{source_name_part}}.h", root_build_dir),
+    ]
+  }
+}
+template("qt_moc") {
+  action_name = "${target_name}"
+  action_foreach(action_name) {
+    script = "//build/qt_bin_tool.py"
+    sources = invoker.sources
+    outputs = [ "$target_gen_dir/{{source_name_part}}.moc.cc" ]
+    args = [
+      "moc",
+      "{{source}}",
+      "-o",
+      rebase_path("$target_gen_dir/{{source_name_part}}.moc.cc",
+                  root_build_dir),
+    ]
+  }
+}
+template("qexecutable") {
+  if (defined(invoker.qrc)) {
+    qt_rcc("${target_name}_qrc") {
+      sources = invoker.qrc
+    }
+  }
+
+  if (defined(invoker.moc)) {
+    qt_moc("${target_name}_moc") {
+      sources = invoker.moc
+    }
+  }
+
+  if (defined(invoker.ui)) {
+    qt_uic("${target_name}_ui") {
+      sources = invoker.ui
+    }
+  }
+
+  executable(target_name) {
+    forward_variables_from(invoker,
+                           [
+                             "defines",
+                             "testonly",
+                             "visibility",
+                             "include_dirs",
+                             "sources",
+                           ])
+    deps = []
+    if(!defined(include_dirs)){
+        include_dirs = []
+    }
+    if(defined(invoker.configs)){
+        configs += invoker.configs
+    }
+    if (defined(invoker.qrc)) {
+      deps += [ ":${target_name}_qrc" ]
+      sources += get_target_outputs(":${target_name}_qrc")
+    }
+    if (defined(invoker.ui)) {
+      deps += [ ":${target_name}_ui" ]
+      sources += get_target_outputs(":${target_name}_ui")
+      include_dirs += [target_gen_dir]
+    }
+    if (defined(invoker.moc)) {
+      deps += [ ":${target_name}_moc" ]
+      sources += get_target_outputs(":${target_name}_moc")
+    }
+  }
+}

@@ -23,7 +23,7 @@
 
 
 template("qt_moc_generator") {
-  assert(defined(invoker.qt_moc_generator_path), "Need correct path to qt_moc_generator.py")
+  # assert(defined(invoker.qt_moc_generator_path), "Need correct path to qt_moc_generator.py")
   assert(defined(invoker.sources), "Need sources for gt_moc_generator")
   moc_sources = invoker.sources
   moc_in_dir = get_path_info(moc_sources[0], "dir")
@@ -84,7 +84,7 @@ template("qt_moc_generator") {
   # Generate moc cc sources.
   action(action_name) {
     visibility = [ ":$source_set_name" ]
-    script = invoker.qt_moc_generator_path  
+    script = "//build/qt_moc_generator.py"  
     sources = moc_sources
     outputs = get_path_info(mocgens, "abspath")
     args = headers
